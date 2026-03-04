@@ -3,6 +3,7 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 
 const app = express()
+const connectToDB = require("./config/database")
 
 app.use(express.json())
 app.use(cookieParser())
@@ -10,6 +11,12 @@ app.use(cors({
     origin: true,
     credentials: true
 }))
+
+// Serverless Database Connection Middleware
+app.use(async (req, res, next) => {
+    await connectToDB();
+    next();
+})
 
 app.get("/health", async (req, res) => {
     return res.status(200).json({
