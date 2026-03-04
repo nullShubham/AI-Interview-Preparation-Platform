@@ -1,48 +1,90 @@
 # AI Interview Preparation Platform
 
-This project is a full-stack web application designed to help users prepare for job interviews. By analyzing a user's resume, job description, and self-description, the application leverages Google's Generative AI to create customized interview preparation reports, including technical and behavioral questions, skill gap analysis, and tailored preparation plans.
+A full-stack intelligent web application that helps candidates prepare for job interviews. By analyzing a candidate's resume, a target job description, and a brief self-description, the platform uses Google's Generative AI to create a highly customized preparation strategy. 
+
+## ✨ Key Features
+- **AI-Powered Analysis**: Generates expected technical and behavioral questions tailored entirely to the target role.
+- **Skill Gap Detection**: Automatically detects missing skills by comparing your resume against the job description.
+- **Preparation Roadmap**: Provides a day-by-day structured timeline to ensure you cover all bases before the interview.
+- **Resume Export**: Redesigns and exports your resume into a stunning, ATS-friendly, single-page PDF format.
+- **Modern UI**: Features a premium glassmorphic Dashboard, animated loading states, and a highly responsive Landing page.
+- **Secure Authentication**: Complete flow with Registration, Login, and Logout protected by JWT and bcrypt hashing.
+
+---
 
 ## 🏗️ Architecture & Tech Stack
 
-This project is divided into two parts: a **Frontend** client and a **Backend** server.
+This project is divided into an isolated **Frontend** and **Backend**.
 
-### Frontend
+### Frontend (Client)
 - **Framework**: React 19 powered by Vite.
-- **Routing**: React Router v7 (`/login`, `/register`, `/`, `/interview/:interviewId`).
-- **Styling**: SCSS (Sass) for customized component styling.
-- **Data Fetching**: Axios for API communication.
-- **Functionality**:
-  - Handles user authentication (Login/Registration).
-  - Protected routes that ensure users are logged in to access the core platform.
-  - UI for uploading resumes, entering job descriptions, and viewing the AI-generated interview reports.
+- **Routing**: React Router v7 (`/`, `/login`, `/register`, `/dashboard`, `/interview/:interviewId`).
+- **Styling**: SCSS (Sass) for customized, scoped component styling.
+- **State & Data Fetching**: React Context API & Axios.
 
-### Backend
+### Backend (Server)
 - **Framework**: Node.js with Express.js.
-- **Database**: MongoDB (via Mongoose) to securely store users, auth blacklists, and interview reports.
-- **AI Integration**: `@google/genai` (Google Gemini AI) to process text and generate insightful interview preparation data.
-- **File Handling**: `multer` for receiving uploaded PDF resumes and `pdf-parse` for extracting text from them.
-- **Authentication**: JWT (`jsonwebtoken`) and `bcryptjs` for secure password hashing and session management.
-- **Validation**: Schema validation via `zod`.
-- **Other Utilities**: `puppeteer` to automate and generate a downloadable PDF version of the AI-enhanced resume or report.
+- **Database**: MongoDB (via Mongoose) to securely store users, auth blacklists, and generated interview reports.
+- **AI Integration**: `@google/genai` (Google Gemini 2.5 Flash) to process complex text and return structured JSON reports.
+- **File Parsing**: `multer` and `pdf-parse` for extracting raw text directly from PDF uploads.
+- **Authentication**: JWT (`jsonwebtoken`) and `bcryptjs`.
+- **PDF Generation**: `puppeteer` to automate and print HTML into beautifully formatted PDFs without margins.
+
+---
 
 ## 🚀 How It Works (The Core Flow)
 
-1. **Authentication:** A user registers and logs into the application. Only authenticated users can generate and view reports.
-2. **Data Input:** The user navigates to the dashboard (Home page) and uploads their Resume (PDF). They also provide the specific target Job Description and a brief Self-Description.
-3. **Data Parsing:** The Express backend receives the request. `multer` processes the file upload in memory, and `pdf-parse` extracts the raw text from the user's resume.
-4. **AI Generation:** The backend controller passes the extracted resume text, job description, and self-description to a dedicated AI service (`@google/genai`).
-5. **Insights Creation:** Google's AI model analyzes the inputs and returns structured data containing:
-    - Expected Technical Questions
-    - Expected Behavioral Questions
-    - Identified Skill Gaps based on the resume vs. job description
-    - A custom Preparation Plan
-6. **Storage & Delivery:** The output is saved permanently in MongoDB and sent back to the React UI, allowing the user to deeply review their interview strategy dynamically via a dedicated page (`/interview/:interviewId`).
-7. **Exporting:** Users can optionally trigger an endpoint that utilizes `puppeteer` to export their newly generated data/resume as a neatly formatted downloadable PDF.
+1. **Onboarding:** A user visits the landing page (`/`), registers, and logs into the application. 
+2. **Data Input:** The user navigates to the `/dashboard` and uploads their Resume (PDF). They also provide the specific target Job Description.
+3. **Data Parsing:** The Express backend receives the request. `multer` processes the file in memory, and `pdf-parse` extracts the raw text.
+4. **AI Generation:** The backend passes the extracted resume text and job description to the Google Gemini API using a strict system prompt.
+5. **Insights Creation:** The AI model analyzes the inputs and returns structured JSON data containing:
+    - Expected Technical & Behavioral Questions
+    - Identified Skill Gaps (with severity levels)
+    - A custom Day-by-Day Preparation Plan
+6. **Review & Preparation:** The output is saved in MongoDB and displayed on the frontend via a dedicated immersive page (`/interview/:id`).
+7. **Resume Formatting:** Users can click "Download Resume" to trigger an automated Puppeteer service that uses AI to rewrite, format, and export their resume as a stunning single-page A4 PDF.
 
-## 📂 Folder Structure Highlights
+---
 
-*   **`Frontend/src/features/`**: Modular architecture containing grouped functionalities (e.g., `auth/` components and pages, `interview/` components and pages).
-*   **`Backend/src/routes/` & `controllers/`**: Clear separation of concerns mapping HTTP endpoints (`auth.routes.js`, `interview.routes.js`) to executable logic (`auth.controller.js`, `interview.controller.js`).
-*   **`Backend/src/services/ai.service.js`**: Abstraction layer dedicated to interacting with the Google GenAI API.
+## 🛠️ Local Setup Instructions
 
-This modular structure ensures that the platform is scalable, secure, and maintainable.
+### Prerequisites
+- Node.js (v18+)
+- MongoDB (Local or Atlas URI)
+- Google Gemini API Key
+
+### 1. Backend Setup
+```bash
+cd Backend
+npm install
+
+# Create environment variables based on .env.example
+cp .env.example .env
+
+# Set up your .env file with actual values:
+# PORT=3000
+# MONGO_URI=your_mongodb_connection_string
+# JWT_SECRET=your_jwt_secret_key
+# GOOGLE_GENAI_API_KEY=your_gemini_api_key
+
+# Run the development server
+npm run dev
+```
+
+### 2. Frontend Setup
+```bash
+cd Frontend
+npm install
+
+# Create environment variables based on .env.example
+cp .env.example .env
+
+# Verify your VITE_API_BASE_URL points to the backend:
+# VITE_API_BASE_URL="http://localhost:3000"
+
+# Run the development server
+npm run dev
+```
+
+Your app will now be running concurrently! Visit `http://localhost:5173` (or your Vite port) to view the application.
